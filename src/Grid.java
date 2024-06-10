@@ -14,13 +14,13 @@ public class Grid {
 		initializeGrid();
 		loadWords(level.getWords());
 		placeWordsInGrid();
+		fillEmptySpaces();
 	}
 
 	private void initializeGrid() {
-		Random random = new Random();
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
-				grid[i][j] = (char) ('A' + random.nextInt(26));
+				grid[i][j] = '.';
 			}
 		}
 	}
@@ -32,13 +32,62 @@ public class Grid {
 	}
 
 	private void placeWordsInGrid() {
-		// Implementasi logika untuk meletakkan kata di grid
 		for (String word : words) {
-			// Contoh sederhana, Anda bisa mengembangkan logika penempatan kata yang lebih baik
-			int row = new Random().nextInt(grid.length);
-			int col = new Random().nextInt(grid.length - word.length());
-			for (int i = 0; i < word.length(); i++) {
-				grid[row][col + i] = word.charAt(i);
+			placeWord(word);
+		}
+	}
+
+	private void placeWord(String word) {
+		Random random = new Random();
+		boolean placed = false;
+		while (!placed) {
+			int direction = random.nextInt(2); // 0 horizontal, 1 vertical
+			int row = random.nextInt(grid.length);
+			int col = random.nextInt(grid[0].length);
+
+			if (direction == 0 && col + word.length() <= grid[0].length) {
+				if (canPlaceHorizontally(row, col, word)) {
+					for (int i = 0; i < word.length(); i++) {
+						grid[row][col + i] = word.charAt(i);
+					}
+					placed = true;
+				}
+			} else if (direction == 1 && row + word.length() <= grid.length) {
+				if (canPlaceVertically(row, col, word)) {
+					for (int i = 0; i < word.length(); i++) {
+						grid[row + i][col] = word.charAt(i);
+					}
+					placed = true;
+				}
+			}
+		}
+	}
+
+	private boolean canPlaceHorizontally(int row, int col, String word) {
+		for (int i = 0; i < word.length(); i++) {
+			if (grid[row][col + i] != '.' && grid[row][col + i] != word.charAt(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean canPlaceVertically(int row, int col, String word) {
+		for (int i = 0; i < word.length(); i++) {
+			if (grid[row + i][col] != '.' && grid[row + i][col] != word.charAt(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void fillEmptySpaces() {
+		Random random = new Random();
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				if (grid[i][j] == '.') {
+					grid[i][j] = (char) ('A' + random.nextInt(26));
+				}
 			}
 		}
 	}
@@ -59,7 +108,6 @@ public class Grid {
 	}
 
 	private boolean isWordInGrid(String word) {
-		// Implementasi logika untuk memeriksa apakah kata ada di grid
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
 				if (checkHorizontal(i, j, word) || checkVertical(i, j, word)) {
